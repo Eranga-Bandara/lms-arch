@@ -10,6 +10,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lk.ijse.dep9.dto.MemberDTO;
 import lk.ijse.dep9.api.util.HttpServlet2;
 import lk.ijse.dep9.exception.ResponseStatusException;
+import lk.ijse.dep9.service.BOLogics;
+import lk.ijse.dep9.util.ConnectionUtil;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -244,15 +246,8 @@ public class MemberServlet extends HttpServlet2 {
                 }
 
                 try(Connection connection = pool.getConnection()) {
-                    member.setId(UUID.randomUUID().toString());
-                    PreparedStatement stm = connection.prepareStatement("INSERT INTO member (id, name, address, contact) VALUES (?, ?, ?, ?)");
-                    stm.setString(1, member.getId());
-                    stm.setString(2, member.getName());
-                    stm.setString(3, member.getAddress());
-                    stm.setString(4, member.getContact());
-
-                    int affectedRows = stm.executeUpdate();
-                    if (affectedRows == 1){
+                    ConnectionUtil.setConnection(connection);
+                    if (BOLogics.createMember(member)){
                         response.setStatus(HttpServletResponse.SC_CREATED);
                         response.setContentType("application/json");
                         JsonbBuilder.create().toJson(member, response.getWriter());
@@ -293,14 +288,11 @@ public class MemberServlet extends HttpServlet2 {
 
     private void deleteMember(String memberId, HttpServletResponse response){
         try(Connection connection = pool.getConnection()) {
-            PreparedStatement stm = connection.prepareStatement("DELETE FROM member WHERE id = ?");
-            stm.setString(1, memberId);
-            int affectedRows = stm.executeUpdate();
-            if (affectedRows == 0){
-//                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid member id");
-                throw new ResponseStatusException(404, "Invalid member id");
-            }else{
+            ConnectionUtil.setConnection(connection);
+            if (BOLogics.deleteMember(memberId)){
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+            }else{
+                throw new ResponseStatusException(400, "Something went wrong");
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -343,13 +335,8 @@ public class MemberServlet extends HttpServlet2 {
             }
 
             try(Connection connection = pool.getConnection()) {
-                PreparedStatement stm = connection.prepareStatement("UPDATE member SET name=?, address=?, contact=? WHERE id=?");
-                stm.setString(1, member.getName());
-                stm.setString(2, member.getAddress());
-                stm.setString(3, member.getContact());
-                stm.setString(4, member.getId());
-
-                if(stm.executeUpdate() == 1){
+               ConnectionUtil.setConnection(connection);
+                if(BOLogics.updateMember(member)){
                     response.setStatus(HttpServletResponse.SC_NO_CONTENT);
                 }else{
 //                    response.sendError(HttpServletResponse.SC_NOT_FOUND, "Member does not exist");

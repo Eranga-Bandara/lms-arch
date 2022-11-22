@@ -10,6 +10,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lk.ijse.dep9.api.util.HttpServlet2;
 import lk.ijse.dep9.dto.BookDTO;
 import lk.ijse.dep9.dto.MemberDTO;
+import lk.ijse.dep9.service.BOLogics;
+import lk.ijse.dep9.util.ConnectionUtil;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -229,20 +231,8 @@ public class BookServlet extends HttpServlet2 {
             }
 
             try (Connection connection = pool.getConnection()) {
-                PreparedStatement stmExist = connection.prepareStatement("SELECT isbn FROM book WHERE isbn=?");
-                stmExist.setString(1, book.getIsbn());
-                if (stmExist.executeQuery().next()) {
-                    response.sendError(HttpServletResponse.SC_CONFLICT, "Book already exists with this ISBN");
-                    return;
-                }
-                PreparedStatement stm = connection.prepareStatement("INSERT INTO book (isbn, title, author, copies) VALUES (?, ?, ?, ?)");
-                stm.setString(1, book.getIsbn());
-                stm.setString(2, book.getTitle());
-                stm.setString(3, book.getAuthor());
-                stm.setInt(4, book.getCopies());
-
-                int affectedRows = stm.executeUpdate();
-                if (affectedRows == 1) {
+                ConnectionUtil.setConnection(connection);
+                if (BOLogics.saveBook(book)) {
                     response.setStatus(HttpServletResponse.SC_CREATED);
                     response.setContentType("application/json");
                     JsonbBuilder.create().toJson(book, response.getWriter());
@@ -292,14 +282,8 @@ public class BookServlet extends HttpServlet2 {
             }
 
             try (Connection connection = pool.getConnection()) {
-                PreparedStatement stm = connection.prepareStatement("UPDATE book SET title=?, author=?, copies=? WHERE isbn=?");
-                stm.setString(1, book.getTitle());
-                stm.setString(2, book.getAuthor());
-                stm.setInt(3, book.getCopies());
-                stm.setString(4, book.getIsbn());
-
-
-                if (stm.executeUpdate() == 1) {
+                ConnectionUtil.setConnection(connection);
+                if (BOLogics.updateBook(book)) {
                     response.setStatus(HttpServletResponse.SC_NO_CONTENT);
                 } else {
                    response.sendError(HttpServletResponse.SC_NOT_FOUND, "Book does not exist");
