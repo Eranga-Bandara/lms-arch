@@ -1,5 +1,6 @@
 package lk.ijse.dep9.dao;
 
+import lk.ijse.dep9.dao.exception.ConstraintViolationException;
 import lk.ijse.dep9.entity.IssueItem;
 import lk.ijse.dep9.entity.IssueItemPK;
 
@@ -29,7 +30,7 @@ public class IssuItemDAO {
         }
     }
 
-    public void deleteIssueItemByPK(IssueItemPK issueItemPK){
+    public void deleteIssueItemByPK(IssueItemPK issueItemPK) throws ConstraintViolationException {
         PreparedStatement stm = null;
         try {
             stm = connection.prepareStatement("DELETE FROM issue_item WHERE isbn = ? AND issue_id = ?");
@@ -37,6 +38,7 @@ public class IssuItemDAO {
             stm.setInt(2, issueItemPK.getIssueId());
             stm.executeUpdate();
         } catch (SQLException e) {
+            if (existsIssueItemByPK(issueItemPK)) throw new ConstraintViolationException("Issue item still exists within other tables",e);
             throw new RuntimeException(e);
         }
     }
