@@ -10,8 +10,13 @@ import java.sql.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class IssueNote implements Serializable {
+public class IssueNote implements SuperEntity {
     private int id;
     private Date date;
     private String memberId;
+
+    public IssueNote(Date date, String memberId) {
+        this.date = date;
+        this.memberId = memberId;
+    }
 }

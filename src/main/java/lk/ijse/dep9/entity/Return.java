@@ -11,7 +11,7 @@ import java.sql.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class Return implements Serializable {
+public class Return implements SuperEntity {
 
     private Date date;
     private ReturnPK returnPK;

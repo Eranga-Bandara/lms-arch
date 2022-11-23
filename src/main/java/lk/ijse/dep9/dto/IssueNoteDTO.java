@@ -17,4 +17,5 @@ public class IssueNoteDTO implements Serializable {
     private LocalDate date;
     private String memberId;
     private ArrayList<String> books = new ArrayList<>();
+
 }

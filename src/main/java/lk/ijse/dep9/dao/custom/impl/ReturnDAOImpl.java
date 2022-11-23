@@ -1,6 +1,6 @@
-package lk.ijse.dep9.dao.impl;
+package lk.ijse.dep9.dao.custom.impl;
 
-import lk.ijse.dep9.dao.ReturnDAO;
+import lk.ijse.dep9.dao.custom.ReturnDAO;
 import lk.ijse.dep9.entity.Return;
 import lk.ijse.dep9.entity.ReturnPK;
 

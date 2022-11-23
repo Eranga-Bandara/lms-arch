@@ -1,5 +1,6 @@
-package lk.ijse.dep9.dao;
+package lk.ijse.dep9.dao.custom;
 
+import lk.ijse.dep9.dao.SuperDAO;
 import lk.ijse.dep9.dao.exception.ConstraintViolationException;
 import lk.ijse.dep9.entity.Member;
 
@@ -10,21 +11,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public interface MemberDAO {
+public interface MemberDAO extends SuperDAO <Member, String>{
 
-    public long countMembers() ;
-
-    public void deleteMemberById(String id) throws ConstraintViolationException ;
-
-    public boolean existsMemberById(String id) ;
-
-    public List<Member> findAllMembers();
-
-    public Optional<Member> findMemberById(String id) ;
-
-    public Member saveMember(Member member) ;
-
-    public Member updateMember(Member member) ;
+//    public long countMembers() ;
+//
+//    public void deleteMemberById(String id) throws ConstraintViolationException ;
+//
+//    public boolean existsMemberById(String id) ;
+//
+//    public List<Member> findAllMembers();
+//
+//    public Optional<Member> findMemberById(String id) ;
+//
+//    public Member saveMember(Member member) ;
+//
+//    public Member updateMember(Member member) ;
 
     public List<Member> findMembersByQuery(String query);
 
