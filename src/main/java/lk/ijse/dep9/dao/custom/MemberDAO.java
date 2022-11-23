@@ -1,17 +1,11 @@
 package lk.ijse.dep9.dao.custom;
 
-import lk.ijse.dep9.dao.SuperDAO;
-import lk.ijse.dep9.dao.exception.ConstraintViolationException;
+import lk.ijse.dep9.dao.CrudDAO;
 import lk.ijse.dep9.entity.Member;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-public interface MemberDAO extends SuperDAO <Member, String>{
+public interface MemberDAO extends CrudDAO<Member, String> {
 
 //    public long countMembers() ;
 //
@@ -27,10 +21,9 @@ public interface MemberDAO extends SuperDAO <Member, String>{
 //
 //    public Member updateMember(Member member) ;
 
-    public List<Member> findMembersByQuery(String query);
+    List<Member> findMembersByQuery(String query);
 
-    public List<Member> findMembersByQuery(String query, int page, int size) ;
-
-    public List<Member> findAllMembers(int page, int size);
+    List<Member> findMembersByQuery(String query, int size, int page);
+    List<Member> findAllMembers(int size, int page);
 
 }
