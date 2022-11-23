@@ -14,14 +14,14 @@ import java.util.Optional;
 
 public class MemberDAOImpl implements MemberDAO {
 
-    private Connection connection;
+    private final Connection connection;
 
     public MemberDAOImpl(Connection connection) {
         this.connection = connection;
     }
 
     @Override
-    public long countMembers() {
+    public long count() {
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT COUNT(id) FROM member");
             ResultSet rst = stm.executeQuery();
@@ -33,19 +33,19 @@ public class MemberDAOImpl implements MemberDAO {
     }
 
     @Override
-    public void deleteMemberById(String id) throws ConstraintViolationException {
+    public void deleteById(String id) throws ConstraintViolationException {
         try {
             PreparedStatement stm = connection.prepareStatement("DELETE FROM member WHERE id = ?");
             stm.setString(1, id);
             stm.executeUpdate();
         } catch (SQLException e) {
-            if(existsMemberById(id)) throw new ConstraintViolationException("Member id still exists in other tables", e);
+            if(existsById(id)) throw new ConstraintViolationException("Member id still exists in other tables", e);
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public boolean existsMemberById(String id) {
+    public boolean existsById(String id) {
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT id FROM member WHERE id = ?");
             stm.setString(1, id);
@@ -56,7 +56,7 @@ public class MemberDAOImpl implements MemberDAO {
     }
 
     @Override
-    public List<Member> findAllMembers() {
+    public List<Member> findAll() {
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM member");
             ResultSet rst = stm.executeQuery();
@@ -75,7 +75,7 @@ public class MemberDAOImpl implements MemberDAO {
     }
 
     @Override
-    public Optional<Member> findMemberById(String id) {
+    public Optional<Member> findById(String id) {
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM member WHERE id = ?");
             stm.setString(1, id);
@@ -94,7 +94,7 @@ public class MemberDAOImpl implements MemberDAO {
     }
 
     @Override
-    public Member saveMember(Member member) {
+    public Member save(Member member) {
         try {
             PreparedStatement stm = connection.prepareStatement("INSERT INTO member (id, name, address, contact) VALUES (?, ?, ?, ?)");
             stm.setString(1, member.getId());
@@ -112,7 +112,7 @@ public class MemberDAOImpl implements MemberDAO {
     }
 
     @Override
-    public Member updateMember(Member member) {
+    public Member update(Member member) {
         try {
             PreparedStatement stm = connection.prepareStatement("UPDATE member SET name = ?, address = ?, contact = ? WHERE id = ?");
             stm.setString(1, member.getName());
@@ -154,7 +154,7 @@ public class MemberDAOImpl implements MemberDAO {
     }
 
     @Override
-    public List<Member> findMembersByQuery(String query, int page, int size) {
+    public List<Member> findMembersByQuery(String query, int size, int page) {
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM member WHERE id LIKE ? OR name LIKE ? OR address LIKE ? OR contact LIKE ? LIMIT ? OFFSET ?");
             query = "%" + query + "%";
@@ -162,7 +162,7 @@ public class MemberDAOImpl implements MemberDAO {
             stm.setString(2, query);
             stm.setString(3, query);
             stm.setString(4, query);
-            stm.setInt(5, page);
+            stm.setInt(5, size);
             stm.setInt(6, (page - 1) * size);
             ResultSet rst = stm.executeQuery();
             List<Member> memberList = new ArrayList<>();
@@ -180,10 +180,10 @@ public class MemberDAOImpl implements MemberDAO {
     }
 
     @Override
-    public List<Member> findAllMembers(int page, int size){
+    public List<Member> findAllMembers(int size, int page){
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM member LIMIT ? OFFSET ?");
-            stm.setInt(1, page);
+            stm.setInt(1, size);
             stm.setInt(2, (page - 1) * size);
             ResultSet rst = stm.executeQuery();
             List<Member> memberList = new ArrayList<>();
