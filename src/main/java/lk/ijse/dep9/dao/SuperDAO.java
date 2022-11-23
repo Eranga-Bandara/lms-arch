@@ -8,20 +8,20 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-public interface SuperDAO <T extends SuperEntity, ID extends Serializable> {
+public interface SuperDAO {
 
-    long count();
-
-    void deleteById(ID PK) throws ConstraintViolationException;
-
-    boolean existsById(ID PK);
-
-    List<T> findAll();
-
-    Optional<T> findById(ID PK);
-
-    Object save(T entity) throws ConstraintViolationException;
-
-    Object update(T entity) throws ConstraintViolationException;
+//    long count();
+//
+//    void deleteById(ID PK) throws ConstraintViolationException;
+//
+//    boolean existsById(ID PK);
+//
+//    List<T> findAll();
+//
+//    Optional<T> findById(ID PK);
+//
+//    Object save(T entity) throws ConstraintViolationException;
+//
+//    Object update(T entity) throws ConstraintViolationException;
 
 }
