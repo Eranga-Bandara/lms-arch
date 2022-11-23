@@ -117,7 +117,7 @@ public class ReturnDAOImpl implements ReturnDAO {
             stm.setInt(2, returnItem.getReturnPK().getIssueId());
             stm.setString(3, returnItem.getReturnPK().getIsbn());
             if(stm.executeUpdate() == 1){
-                return returnItem
+                return returnItem;
             }else{
                 throw new SQLException("Failed to update the return item");
             }

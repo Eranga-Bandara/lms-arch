@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface IssueNoteDAO extends CrudDAO<IssueNote, Integer> {
+    Optional<IssueNote> findByID(Integer id);
 //    Optional<IssueNote> findByID(Integer id);
 
 //    public long countIssueNotes();

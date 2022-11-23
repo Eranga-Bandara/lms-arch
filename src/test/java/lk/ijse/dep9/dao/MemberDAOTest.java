@@ -26,7 +26,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 //@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class MemberDAOTest {
+class  MemberDAOTest {
 
     private MemberDAOImpl memberDAO;
     private Connection connection;
@@ -69,7 +69,7 @@ class MemberDAOTest {
     //    @Order(1)
     @Test
     void countMembers() {
-        long actualMemberCount = memberDAO.countMembers();
+        long actualMemberCount = memberDAO.count();
         assertEquals(5, actualMemberCount);
 //        System.out.println(this);
     }
@@ -98,10 +98,10 @@ class MemberDAOTest {
 
         Member expectedMember = new Member(UUID.randomUUID().toString(), faker.name().fullName(), faker.address().fullAddress(), faker.regexify("0\\d{2}-\\d{7}"));
         System.out.println(expectedMember);
-        long expectedCount = memberDAO.countMembers() + 1;
-        Member actualMember = memberDAO.saveMember(expectedMember);
+        long expectedCount = memberDAO.count() + 1;
+        Member actualMember = memberDAO.save(expectedMember);
         assertEquals(expectedMember, actualMember);
-        assertEquals(expectedCount, memberDAO.countMembers());
+        assertEquals(expectedCount, memberDAO.count());
 //        System.out.println(this);
     }
 
@@ -109,7 +109,7 @@ class MemberDAOTest {
     @CsvFileSource(resources = "/member-test-data.csv")
     void deleteMemberById(String memberId, boolean expectedResult) {
         try {
-            memberDAO.deleteMemberById(memberId);
+            memberDAO.deleteById(memberId);
         } catch (ConstraintViolationException e) {
             System.out.println("Failed to delete " + memberId);
         }
@@ -122,28 +122,28 @@ class MemberDAOTest {
     @CsvFileSource(resources = "/member-test-data.csv")
     void existsMemberById(String memberId, boolean expectedResult) {
 //        String memberId = "86f4c85d-5803-11ed-be5d-d89d67cd0f57";
-        boolean actualValue = memberDAO.existsMemberById(memberId);
+        boolean actualValue = memberDAO.existsById(memberId);
         assertTrue(actualValue == expectedResult);
     }
 
     @ParameterizedTest
     @CsvFileSource(resources = "/member-test-data.csv")
     void findMemberById(String memberId, boolean expectedResult) {
-        Optional<Member> optMember = memberDAO.findMemberById(memberId);
+        Optional<Member> optMember = memberDAO.findById(memberId);
         assertTrue(optMember.isPresent() == expectedResult);
     }
 
     @ParameterizedTest
     @CsvFileSource(resources = "/member-test-data.csv")
     void updateMember(String memberId, boolean exist) {
-        Optional<Member> optMember = memberDAO.findMemberById(memberId);
+        Optional<Member> optMember = memberDAO.findById(memberId);
         Faker faker = new Faker();
 
         optMember.ifPresent(member -> {
             member.setName(faker.name().fullName());
             member.setAddress(faker.address().fullAddress());
             member.setContact(faker.regexify("0\\d{2}-\\d{7}"));
-            Member updatedMember = memberDAO.updateMember(member);
+            Member updatedMember = memberDAO.update(member);
             assertEquals(member, updatedMember);
         });
     }

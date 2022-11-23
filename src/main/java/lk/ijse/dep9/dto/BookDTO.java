@@ -10,6 +10,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookDTO implements Serializable {
+//    fields we like to use in data transfer
     private String isbn;
     private String title;
     private String author;
