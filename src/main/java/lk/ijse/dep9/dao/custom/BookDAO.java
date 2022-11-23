@@ -1,5 +1,6 @@
 package lk.ijse.dep9.dao.custom;
 
+import lk.ijse.dep9.dao.CrudDAO;
 import lk.ijse.dep9.dao.SuperDAO;
 import lk.ijse.dep9.dao.exception.ConstraintViolationException;
 import lk.ijse.dep9.entity.Book;
@@ -7,7 +8,7 @@ import lk.ijse.dep9.entity.Book;
 import java.util.List;
 import java.util.Optional;
 
-public interface BookDAO extends SuperDAO<Book, String> {
+public interface BookDAO extends CrudDAO<Book, String> {
 
 //    public long countBooks();
 //
