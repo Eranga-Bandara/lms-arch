@@ -7,6 +7,8 @@ import lk.ijse.dep9.service.custom.impl.MemberServiceImpl;
 import lk.ijse.dep9.service.custom.impl.ReturnServiceImpl;
 
 public class ServiceFactory {
+
+    // making singleton
     private static ServiceFactory serviceFactory;
 
     public ServiceFactory() {
