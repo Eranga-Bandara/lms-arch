@@ -77,7 +77,7 @@ class MemberDAOTest {
     //    @Order(1)
     @Test
     void findAllMembers() {
-        List<Member> members = memberDAO.findAllMembers();
+        List<Member> members = memberDAO.findAllMembers(2,5);
         assertEquals(5, members.size());
         members.forEach(member -> {
             assertNotNull(member);
