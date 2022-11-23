@@ -25,8 +25,8 @@ public interface BookDAO extends SuperDAO<Book, String> {
 
     public List<Book> findBooksByQuery(String query);
 
-    public List<Book> findBooksByQuery(String query, int page, int size);
+    public List<Book> findBooksByQuery(String query, int size, int page);
 
-    public List<Book> findAllBooks(int page, int size);
+    public List<Book> findAllBooks(int size, int page);
 
 }
