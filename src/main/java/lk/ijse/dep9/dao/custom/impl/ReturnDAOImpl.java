@@ -1,7 +1,6 @@
-package lk.ijse.dep9.dao;
+package lk.ijse.dep9.dao.impl;
 
-import lk.ijse.dep9.entity.IssueItem;
-import lk.ijse.dep9.entity.IssueItemPK;
+import lk.ijse.dep9.dao.ReturnDAO;
 import lk.ijse.dep9.entity.Return;
 import lk.ijse.dep9.entity.ReturnPK;
 
@@ -10,14 +9,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class ReturnDAO {
+public class ReturnDAOImpl implements ReturnDAO {
 
     private Connection connection;
 
-    public ReturnDAO(Connection connection) {
+    public ReturnDAOImpl(Connection connection) {
         this.connection = connection;
     }
 
+    @Override
     public long countReturns() {
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT COUNT(isbn) FROM `return`");
@@ -29,6 +29,7 @@ public class ReturnDAO {
         }
     }
 
+    @Override
     public void deleteReturnByPK(ReturnPK returnPK) {
         try {
             PreparedStatement stm = connection.prepareStatement("DELETE FROM `return` WHERE isbn = ? AND issue_id = ?");
@@ -40,6 +41,7 @@ public class ReturnDAO {
         }
     }
 
+    @Override
     public boolean existsReturnByPK(ReturnPK returnPK){
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM `return` WHERE isbn = ? AND issue_id = ?");
@@ -51,6 +53,7 @@ public class ReturnDAO {
         }
     }
 
+    @Override
     public List<Return> findAllReturns(){
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM `return`");
@@ -68,6 +71,7 @@ public class ReturnDAO {
         }
     }
 
+    @Override
     public Optional<Return> findReturnByPK(ReturnPK issueItemPK){
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM `return` WHERE isbn = ? AND issue_id = ?");
@@ -87,6 +91,7 @@ public class ReturnDAO {
         }
     }
 
+    @Override
     public Return saveReturn(Return returnItem){
         try {
             PreparedStatement stm = connection.prepareStatement("INSERT INTO `return` (date, issue_id, isbn) VALUES (?,?,?)");

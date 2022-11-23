@@ -1,5 +1,6 @@
-package lk.ijse.dep9.dao;
+package lk.ijse.dep9.dao.impl;
 
+import lk.ijse.dep9.dao.MemberDAO;
 import lk.ijse.dep9.dao.exception.ConstraintViolationException;
 import lk.ijse.dep9.entity.Member;
 
@@ -11,14 +12,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class MemberDAO {
+public class MemberDAOImpl implements MemberDAO {
 
     private Connection connection;
 
-    public MemberDAO(Connection connection) {
+    public MemberDAOImpl(Connection connection) {
         this.connection = connection;
     }
 
+    @Override
     public long countMembers() {
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT COUNT(id) FROM member");
@@ -30,6 +32,7 @@ public class MemberDAO {
         }
     }
 
+    @Override
     public void deleteMemberById(String id) throws ConstraintViolationException {
         try {
             PreparedStatement stm = connection.prepareStatement("DELETE FROM member WHERE id = ?");
@@ -41,6 +44,7 @@ public class MemberDAO {
         }
     }
 
+    @Override
     public boolean existsMemberById(String id) {
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT id FROM member WHERE id = ?");
@@ -51,6 +55,7 @@ public class MemberDAO {
         }
     }
 
+    @Override
     public List<Member> findAllMembers() {
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM member");
@@ -69,6 +74,7 @@ public class MemberDAO {
         }
     }
 
+    @Override
     public Optional<Member> findMemberById(String id) {
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM member WHERE id = ?");
@@ -87,6 +93,7 @@ public class MemberDAO {
         }
     }
 
+    @Override
     public Member saveMember(Member member) {
         try {
             PreparedStatement stm = connection.prepareStatement("INSERT INTO member (id, name, address, contact) VALUES (?, ?, ?, ?)");
@@ -104,6 +111,7 @@ public class MemberDAO {
         }
     }
 
+    @Override
     public Member updateMember(Member member) {
         try {
             PreparedStatement stm = connection.prepareStatement("UPDATE member SET name = ?, address = ?, contact = ? WHERE id = ?");
@@ -121,6 +129,7 @@ public class MemberDAO {
         }
     }
 
+    @Override
     public List<Member> findMembersByQuery(String query) {
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM member WHERE id LIKE ? OR name LIKE ? OR address LIKE ? OR contact LIKE ?");
@@ -144,6 +153,7 @@ public class MemberDAO {
         }
     }
 
+    @Override
     public List<Member> findMembersByQuery(String query, int page, int size) {
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM member WHERE id LIKE ? OR name LIKE ? OR address LIKE ? OR contact LIKE ? LIMIT ? OFFSET ?");
@@ -169,6 +179,7 @@ public class MemberDAO {
         }
     }
 
+    @Override
     public List<Member> findAllMembers(int page, int size){
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM member LIMIT ? OFFSET ?");

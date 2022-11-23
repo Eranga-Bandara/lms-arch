@@ -1,5 +1,6 @@
-package lk.ijse.dep9.dao;
+package lk.ijse.dep9.dao.impl;
 
+import lk.ijse.dep9.dao.BookDAO;
 import lk.ijse.dep9.dao.exception.ConstraintViolationException;
 import lk.ijse.dep9.entity.Book;
 
@@ -12,14 +13,15 @@ import java.util.List;
 import java.util.Optional;
 
 
-public class BookDAO {
+public class BookDAOImpl implements BookDAO {
 
     private Connection connection;
 
-    public BookDAO(Connection connection) {
+    public BookDAOImpl(Connection connection) {
         this.connection = connection;
     }
 
+    @Override
     public long countBooks(){
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT COUNT(isbn) FROM book");
@@ -32,6 +34,7 @@ public class BookDAO {
 
     }
 
+    @Override
     public void deleteBookByISBN(String isbn) throws ConstraintViolationException {
         try {
             PreparedStatement stm = connection.prepareStatement("DELETE FROM book WHERE isbn = ?");
@@ -43,6 +46,7 @@ public class BookDAO {
         }
     }
 
+    @Override
     public boolean existsBookByISBN(String isbn){
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT isbn FROM book WHERE isbn = ?");
@@ -53,6 +57,7 @@ public class BookDAO {
         }
     }
 
+    @Override
     public List<Book> findAllBooks(){
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM book");
@@ -71,6 +76,7 @@ public class BookDAO {
         }
     }
 
+    @Override
     public Optional<Book> findBookByISBN(String isbn){
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM book WHERE isbn = ?");
@@ -89,6 +95,7 @@ public class BookDAO {
         }
     }
 
+    @Override
     public Book saveBook(Book book){
         try {
             PreparedStatement stm = connection.prepareStatement("INSERT INTO book (isbn, title, author, copies) VALUES (?, ?, ?, ?)");
@@ -106,6 +113,7 @@ public class BookDAO {
         }
     }
 
+    @Override
     public Book updateBook(Book book){
         try {
             PreparedStatement stm = connection.prepareStatement("UPDATE book SET title = ?, author = ?, copies = ? WHERE isbn = ?");
@@ -123,6 +131,7 @@ public class BookDAO {
         }
     }
 
+    @Override
     public List<Book> findBooksByQuery(String query){
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM book WHERE isbn LIKE ? OR title LIKE ? OR author LIKE ? OR copies LIKE ?");
@@ -146,6 +155,7 @@ public class BookDAO {
         }
     }
 
+    @Override
     public List<Book> findBooksByQuery(String query, int page, int size){
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM book WHERE isbn LIKE ? OR title LIKE ? OR author LIKE ? OR copies LIKE ? LIMIT ? OFFSET ?");
@@ -171,6 +181,7 @@ public class BookDAO {
         }
     }
 
+    @Override
     public List<Book> findAllBooks(int page, int size){
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM book LIMIT ? OFFSET ?");

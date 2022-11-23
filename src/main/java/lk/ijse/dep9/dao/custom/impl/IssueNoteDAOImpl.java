@@ -1,7 +1,7 @@
-package lk.ijse.dep9.dao;
+package lk.ijse.dep9.dao.impl;
 
+import lk.ijse.dep9.dao.IssueNoteDAO;
 import lk.ijse.dep9.dao.exception.ConstraintViolationException;
-import lk.ijse.dep9.entity.Book;
 import lk.ijse.dep9.entity.IssueNote;
 
 import java.sql.*;
@@ -9,14 +9,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class IssueNoteDAO {
+public class IssueNoteDAOImpl implements IssueNoteDAO {
 
     private Connection connection;
 
-    public IssueNoteDAO(Connection connection) {
+    public IssueNoteDAOImpl(Connection connection) {
         this.connection = connection;
     }
 
+    @Override
     public long countIssueNotes(){
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT COUNT(id) FROM issue_note");
@@ -28,6 +29,7 @@ public class IssueNoteDAO {
         }
     }
 
+    @Override
     public void deleteIssueNote(String id) throws ConstraintViolationException {
         try {
             PreparedStatement stm = connection.prepareStatement("DELETE FROM issue_note WHERE id = ?");
@@ -39,6 +41,7 @@ public class IssueNoteDAO {
         }
     }
 
+    @Override
     public boolean existsIssueNoteById(String id){
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT id FROM issue_note WHERE id = ?");
@@ -49,6 +52,7 @@ public class IssueNoteDAO {
         }
     }
 
+    @Override
     public List<IssueNote> findAllIssueNotes(){
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM issue_note");
@@ -66,6 +70,7 @@ public class IssueNoteDAO {
         }
     }
 
+    @Override
     public Optional<IssueNote> findIssueNoteByID(int id){
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM issue_note WHERE id = ?");
@@ -83,6 +88,7 @@ public class IssueNoteDAO {
         }
     }
 
+    @Override
     public IssueNote saveIssueNote(IssueNote issueNote){
         try {
             PreparedStatement stm = connection.prepareStatement("INSERT INTO issue_note (id, date, member_id) VALUES (?, ?, ?)");
@@ -99,6 +105,7 @@ public class IssueNoteDAO {
         }
     }
 
+    @Override
     public IssueNote updateIssueNote(IssueNote issueNote){
         try {
             PreparedStatement stm = connection.prepareStatement("UPDATE issue_note SET date = ?, member_id = ? WHERE id = ?");
@@ -115,6 +122,7 @@ public class IssueNoteDAO {
         }
     }
 
+    @Override
     public List<IssueNote> findIssueNotesByQuery(String query){
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM issue_note WHERE id LIKE ? OR date LIKE ? OR issue_note.member_id LIKE ?");
@@ -136,6 +144,7 @@ public class IssueNoteDAO {
         }
     }
 
+    @Override
     public List<IssueNote> findIssueNotesByQuery(String query, int page, int size){
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM issue_note WHERE id LIKE ? OR date LIKE ? OR issue_note.member_id LIKE ? LIMIT ? OFFSET ?");
@@ -159,6 +168,7 @@ public class IssueNoteDAO {
         }
     }
 
+    @Override
     public List<IssueNote> findAllIssueNotes(int page, int size){
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM issue_note LIMIT ? OFFSET ?");

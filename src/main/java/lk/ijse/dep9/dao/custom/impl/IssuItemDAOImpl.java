@@ -1,5 +1,6 @@
-package lk.ijse.dep9.dao;
+package lk.ijse.dep9.dao.impl;
 
+import lk.ijse.dep9.dao.IssueItemDAO;
 import lk.ijse.dep9.dao.exception.ConstraintViolationException;
 import lk.ijse.dep9.entity.IssueItem;
 import lk.ijse.dep9.entity.IssueItemPK;
@@ -12,13 +13,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class IssuItemDAO {
+public class IssuItemDAOImpl implements IssueItemDAO {
     private Connection connection;
 
-    public IssuItemDAO(Connection connection) {
+    public IssuItemDAOImpl(Connection connection) {
         this.connection = connection;
     }
 
+    @Override
     public long countIssueItems(){
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT COUNT(isbn) FROM issue_item");
@@ -30,6 +32,7 @@ public class IssuItemDAO {
         }
     }
 
+    @Override
     public void deleteIssueItemByPK(IssueItemPK issueItemPK) throws ConstraintViolationException {
         PreparedStatement stm = null;
         try {
@@ -43,6 +46,7 @@ public class IssuItemDAO {
         }
     }
 
+    @Override
     public boolean existsIssueItemByPK(IssueItemPK issueItemPK){
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM issue_item WHERE isbn = ? AND issue_id = ?");
@@ -55,6 +59,7 @@ public class IssuItemDAO {
 
     }
 
+    @Override
     public List<IssueItem> findAllIssueItems(){
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM issue_item");
@@ -71,6 +76,7 @@ public class IssuItemDAO {
         }
     }
 
+    @Override
     public Optional<IssueItem> findIssueItemByPK(IssueItemPK issueItemPK){
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM issue_item WHERE isbn = ? AND issue_id = ?");
@@ -89,6 +95,7 @@ public class IssuItemDAO {
         }
     }
 
+    @Override
     public IssueItem saveIssueItem(IssueItem issueItem){
         try {
             PreparedStatement stm = connection.prepareStatement("INSERT INTO issue_item (issue_id, isbn) VALUES (?,?)");
