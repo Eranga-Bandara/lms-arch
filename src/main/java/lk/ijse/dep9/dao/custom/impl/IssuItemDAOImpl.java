@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class IssuItemDAOImpl implements IssueItemDAO {
-    private Connection connection;
+    private final Connection connection;
 
     public IssuItemDAOImpl(Connection connection) {
         this.connection = connection;
@@ -34,9 +34,8 @@ public class IssuItemDAOImpl implements IssueItemDAO {
 
     @Override
     public void deleteById(IssueItemPK issueItemPK) throws ConstraintViolationException {
-        PreparedStatement stm = null;
         try {
-            stm = connection.prepareStatement("DELETE FROM issue_item WHERE isbn = ? AND issue_id = ?");
+            PreparedStatement stm = connection.prepareStatement("DELETE FROM issue_item WHERE isbn = ? AND issue_id = ?");
             stm.setString(1, issueItemPK.getIsbn());
             stm.setInt(2, issueItemPK.getIssueId());
             stm.executeUpdate();
@@ -83,7 +82,6 @@ public class IssuItemDAOImpl implements IssueItemDAO {
             stm.setString(1, issueItemPK.getIsbn());
             stm.setInt(2, issueItemPK.getIssueId());
             ResultSet rst = stm.executeQuery();
-            List<IssueItem> issueItemList = new ArrayList<>();
             if(rst.next()){
                 String isbn = rst.getString("isbn");
                 int issueId = rst.getInt("issue_id");
@@ -109,5 +107,10 @@ public class IssuItemDAOImpl implements IssueItemDAO {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public IssueItem update(IssueItem entity) throws ConstraintViolationException {
+        return null;
     }
 }
