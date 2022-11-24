@@ -61,6 +61,6 @@ public class MemberServiceImpl implements MemberService {
     public List<MemberDTO> findMembers(String query, int size, int page) {
         List<Member> memberEntityList = memberDAO.findMembersByQuery(query, size, page);
 
-        return memberEntityList.stream().map(converter::fromMember).collect(Collectors.toList())
+        return memberEntityList.stream().map(converter::fromMember).collect(Collectors.toList());
     }
 }
