@@ -8,7 +8,7 @@ public class Converter {
 
     private ModelMapper mapper = new ModelMapper();
 
-    public BookDTO fromBookEntity(Book bookEntity){
+    public BookDTO fromBook(Book bookEntity){
 //        return new BookDTO(bookEntity.getIsbn(),
 //                bookEntity.getTitle(),
 //                bookEntity.getAuthor(),
@@ -16,7 +16,7 @@ public class Converter {
         return mapper.map(bookEntity, BookDTO.class);
     }
 
-    public Book toBookEntity(BookDTO bookDTO){
+    public Book toBook(BookDTO bookDTO){
 //        return new Book(bookDTO.getIsbn(),
 //                bookDTO.getTitle(),
 //                bookDTO.getAuthor(),
