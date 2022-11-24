@@ -18,9 +18,9 @@ public class ServiceFactory {
         return (serviceFactory == null)? (serviceFactory = new ServiceFactory()): serviceFactory;
     }
 
-    public <T extends SuperService> T getService(ServiceTypes serviceTypes){
+    public <T extends SuperService> T getService(ServiceTypes serviceType){
         SuperService service;
-        switch (serviceTypes){
+        switch (serviceType){
             case BOOK:
                 service = new BookServiceImpl();
                 break;

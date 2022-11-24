@@ -6,40 +6,56 @@ import lk.ijse.dep9.dao.custom.BookDAO;
 import lk.ijse.dep9.dto.BookDTO;
 import lk.ijse.dep9.entity.Book;
 import lk.ijse.dep9.service.custom.BookService;
+import lk.ijse.dep9.service.exception.DuplicateException;
+import lk.ijse.dep9.service.exception.NotFoundException;
 import lk.ijse.dep9.util.ConnectionUtil;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class BookServiceImpl implements BookService {
 
     private final BookDAO bookDAO;
 
-    public BookServiceImpl(BookDAO bookDAO) {
+    public BookServiceImpl() {
         this.bookDAO = DAOFactory.getInstance().getDAO(ConnectionUtil.getConnection(), DAOTypes.BOOK);
     }
 
     @Override
-    public void addNewBook(BookDTO dto) {
+    public void addNewBook(BookDTO dto) throws DuplicateException {
 
         if(bookDAO.existsById(dto.getIsbn())){
-
+            throw new DuplicateException("Book with this isbn aleady exixts");
         }
+
         Book bookEntity = new Book(dto.getIsbn(), dto.getTitle(), dto.getAuthor(), dto.getCopies());
         bookDAO.save(bookEntity);
-    }
-
-    @Override
-    public void updateBookDetails(BookDTO dto) {
 
     }
 
     @Override
-    public void getBookDetails(String isbn) {
+    public void updateBookDetails(BookDTO dto) throws NotFoundException {
+        if(!bookDAO.existsById(dto.getIsbn())){
+            throw new NotFoundException("Book does not exist");
+        }
 
+        Book bookEntity = new Book(dto.getIsbn(), dto.getTitle(), dto.getAuthor(), dto.getCopies());
+        bookDAO.update(bookEntity);
+    }
+
+    @Override
+    public BookDTO getBookDetails(String isbn) throws NotFoundException {
+        return bookDAO.findById(isbn).map(e -> new BookDTO(e.getIsbn(), e.getTitle(), e.getAuthor(), e.getCopies()))
+                .orElseThrow(() -> new NotFoundException("Book does not exist"));
     }
 
     @Override
     public List<BookDTO> findBooks(String query, int size, int page) {
-        return null;
+
+        List<Book> bookEntityList = bookDAO.findBooksByQuery(query, size, page);
+        return bookEntityList.stream()
+                .map(e -> new BookDTO(e.getIsbn(), e.getTitle(), e.getAuthor(), e.getCopies()))
+                .collect(Collectors.toList());
+
     }
 }

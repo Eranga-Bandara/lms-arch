@@ -15,8 +15,8 @@ public class DAOFactory {
         return (daoFactory == null) ? daoFactory = new DAOFactory() : daoFactory;
     }
 
-    public <T extends SuperDAO> T getDAO(Connection connection, DAOTypes daoType){
-        switch(daoType){
+    public <T extends SuperDAO> T getDAO(Connection connection, DAOTypes daoType) {
+        switch (daoType) {
             case MEMBER:
                 return (T) new MemberDAOImpl(connection);
             case BOOK:

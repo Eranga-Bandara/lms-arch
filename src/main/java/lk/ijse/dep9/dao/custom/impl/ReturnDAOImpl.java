@@ -31,7 +31,7 @@ public class ReturnDAOImpl implements ReturnDAO {
     }
 
     @Override
-    public void deleteById(ReturnPK returnPK) {
+    public void deleteById(ReturnPK returnPK) throws ConstraintViolationException{
         try {
             PreparedStatement stm = connection.prepareStatement("DELETE FROM `return` WHERE isbn = ? AND issue_id = ?");
             stm.setString(1, returnPK.getIsbn());

@@ -10,6 +10,6 @@ import java.util.List;
 public interface BookService extends SuperService {
     void addNewBook(BookDTO dto) throws DuplicateException;
     void updateBookDetails(BookDTO dto) throws NotFoundException;
-    void getBookDetails(String isbn) throws NotFoundException;
+    BookDTO getBookDetails(String isbn) throws NotFoundException;
     List<BookDTO> findBooks(String query, int size, int page);
 }
