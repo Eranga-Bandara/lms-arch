@@ -33,4 +33,20 @@ public class QueryDAOImpl implements QueryDAO {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public boolean alreadyIssued(String isbn, String memberId) {
+        try{
+            PreparedStatement stm = connection.prepareStatement("SELECT *, b.title FROM issue_item ii\n" +
+            "         INNER JOIN `return` r ON NOT (ii.issue_id = r.issue_id and ii.isbn = r.isbn)\n" +
+                    "         INNER JOIN book b on ii.isbn = b.isbn\n" +
+                    "         INNER JOIN issue_note `in` on ii.issue_id = `in`.id\n" +
+                    "WHERE `in`.member_id = ? AND b.isbn = ?");
+            stm.setString(1, memberId);
+            stm.setString(2, isbn);
+            return stm.executeQuery().next();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

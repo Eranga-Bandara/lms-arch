@@ -22,7 +22,7 @@ public class IssueServiceImpl implements IssueService {
 
     private final QueryDAO queryDAO;
 
-    public IssueServiceImpl(IssueNoteDTO issueNoteDTO) {
+    public IssueServiceImpl() {
         issueNoteDAO = DAOFactory.getInstance().getDAO(ConnectionUtil.getConnection(), DAOTypes.ISSUE_NOTE);
         issueItemDAO = DAOFactory.getInstance().getDAO(ConnectionUtil.getConnection(), DAOTypes.ISSUE_ITEM);
         memberDAO = DAOFactory.getInstance().getDAO(ConnectionUtil.getConnection(), DAOTypes.MEMBER);
@@ -31,6 +31,7 @@ public class IssueServiceImpl implements IssueService {
         converter = new Converter();
     }
 
+
     public void placeNewIssueNote(IssueNoteDTO issueNoteDTO) throws NotFoundException, NotAvailableException, LimitExceedException, AlreadyIssuedException {
 //        check member existance
         if(!memberDAO.existsById(issueNoteDTO.getMemberId())) throw new NotFoundException("Member does not exists");
@@ -38,6 +39,10 @@ public class IssueServiceImpl implements IssueService {
         for(String isbn : issueNoteDTO.getBooks()){
             int copies = queryDAO.getAvailableCopies(isbn).orElseThrow(() -> new NotFoundException("Book " + isbn + " does not exist"));
             if(copies == 0) throw new NotAvailableException("Book " + isbn + " not available at the moment");
+
+            if(queryDAO.alreadyIssued(isbn, issueNoteDTO.getMemberId())){
+                throw new AlreadyIssuedException("Book " + isbn + " has been already issued to the same member");
+            }
         }
 //        check whether a book in issue note has been already issued to this member
 
