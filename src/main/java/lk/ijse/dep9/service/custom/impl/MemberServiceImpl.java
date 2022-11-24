@@ -3,15 +3,18 @@ package lk.ijse.dep9.service.custom.impl;
 import lk.ijse.dep9.dao.DAOFactory;
 import lk.ijse.dep9.dao.DAOTypes;
 import lk.ijse.dep9.dao.custom.MemberDAO;
+import lk.ijse.dep9.dao.exception.ConstraintViolationException;
 import lk.ijse.dep9.dto.MemberDTO;
 import lk.ijse.dep9.entity.Member;
 import lk.ijse.dep9.service.custom.MemberService;
 import lk.ijse.dep9.service.exception.DuplicateException;
+import lk.ijse.dep9.service.exception.InUseException;
 import lk.ijse.dep9.service.exception.NotFoundException;
 import lk.ijse.dep9.service.util.Converter;
 import lk.ijse.dep9.util.ConnectionUtil;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class MemberServiceImpl implements MemberService {
@@ -26,10 +29,10 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public void signupMember(MemberDTO memberDTO) throws DuplicateException {
-        if (memberDAO.existsById(memberDTO.getId())){
+        if (memberDAO.existsByContact(memberDTO.getContact())){
             throw new DuplicateException("Member with this id already exists");
         }
-
+        memberDTO.setId(UUID.randomUUID().toString());
         memberDAO.save(converter.toMember(memberDTO));
     }
 
@@ -46,7 +49,14 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public void removeMemberAccount(String memberId) {
-
+        if(!memberDAO.existsById(memberId)){
+            throw new NotFoundException("Member does not exists");
+        }
+        try {
+            memberDAO.deleteById(memberId);
+        }catch (ConstraintViolationException e){
+            throw new InUseException("Member details are still in use");
+        }
     }
 
     @Override
