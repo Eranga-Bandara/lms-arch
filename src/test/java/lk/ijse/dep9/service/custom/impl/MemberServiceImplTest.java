@@ -10,6 +10,7 @@ import lk.ijse.dep9.entity.Member;
 import lk.ijse.dep9.service.ServiceFactory;
 import lk.ijse.dep9.service.ServiceTypes;
 import lk.ijse.dep9.service.custom.MemberService;
+import lk.ijse.dep9.service.exception.InUseException;
 import lk.ijse.dep9.service.exception.NotFoundException;
 import lk.ijse.dep9.service.util.Converter;
 import lk.ijse.dep9.util.ConnectionUtil;
@@ -24,6 +25,7 @@ import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -84,13 +86,42 @@ class MemberServiceImplTest {
 
     @Test
     void removeMemberAccount() {
+        String member1Id = UUID.randomUUID().toString();
+        String member2Id = "104ccff3-c584-4782-a582-8a06479b46f6";
+        String member3Id = "2714641a-301e-43d5-9d31-ad916d075ba7";
+
+        assertThrows(NotFoundException.class, () -> memberService.removeMemberAccount(member1Id));
+        assertThrows(InUseException.class, () -> memberService.removeMemberAccount(member2Id));
+        assertDoesNotThrow(() -> memberService.removeMemberAccount(member3Id));
+
+        MemberDAO memberDAO = DAOFactory.getInstance().getDAO(ConnectionUtil.getConnection(), DAOTypes.MEMBER);
+        assertFalse(memberDAO.existsById(member3Id));
     }
 
     @Test
     void getMemberDetails() {
+        String member1Id = UUID.randomUUID().toString();
+        String member2Id = "104ccff3-c584-4782-a582-8a06479b46f6";
+        assertThrows(NotFoundException.class, () -> memberService.getMemberDetails(member1Id));
+        MemberDTO memberDetails = memberService.getMemberDetails(member2Id);
+        assertNotNull(memberDetails.getName());
+        assertNotNull(memberDetails.getAddress());
+        assertNotNull(memberDetails.getContact());
+        System.out.println(memberDetails);
+
     }
 
     @Test
     void findMembers() {
+        List<MemberDTO> memberList1= memberService.findMembers("", 2, 1);
+        List<MemberDTO> memberList2= memberService.findMembers("", 2, 2);
+        List<MemberDTO> memberList3= memberService.findMembers("Galle", 10, 1);
+
+        assertEquals(2, memberList1.size());
+        assertEquals(1, memberList2.size());
+        assertEquals(2, memberList3.size());
+
+        memberList3.forEach(System.out::println);
+
     }
 }
