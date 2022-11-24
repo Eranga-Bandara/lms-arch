@@ -21,6 +21,13 @@ public interface MemberDAO extends CrudDAO<Member, String> {
 //
 //    public Member updateMember(Member member) ;
 
+
+//    default boolean existsByContact (String contact){
+//        throw new RuntimeException("Not Implemented yet");
+//    }
+
+    boolean existsByContact (String contact);
+
     List<Member> findMembersByQuery(String query);
 
     List<Member> findMembersByQuery(String query, int size, int page);

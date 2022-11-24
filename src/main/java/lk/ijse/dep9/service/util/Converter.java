@@ -1,7 +1,9 @@
 package lk.ijse.dep9.service.util;
 
 import lk.ijse.dep9.dto.BookDTO;
+import lk.ijse.dep9.dto.MemberDTO;
 import lk.ijse.dep9.entity.Book;
+import lk.ijse.dep9.entity.Member;
 import org.modelmapper.ModelMapper;
 
 public class Converter {
@@ -22,6 +24,14 @@ public class Converter {
 //                bookDTO.getAuthor(),
 //                bookDTO.getCopies());
         return mapper.map(bookDTO, Book.class);
+    }
+
+    public MemberDTO fromMember(Member memberEntity){
+        return mapper.map(memberEntity, MemberDTO.class);
+    }
+
+    public Member toMember(MemberDTO memberDTO){
+        return mapper.map(memberDTO, Member.class);
     }
 
 }

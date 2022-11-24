@@ -130,6 +130,17 @@ public class MemberDAOImpl implements MemberDAO {
     }
 
     @Override
+    public boolean existsByContact(String contact) {
+        try{
+            PreparedStatement stm = connection.prepareStatement("SELECT * FROM member WHERE contact = ?");
+            stm.setString(1, contact);
+            return stm.executeQuery().next();
+        }catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public List<Member> findMembersByQuery(String query) {
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM member WHERE id LIKE ? OR name LIKE ? OR address LIKE ? OR contact LIKE ?");
