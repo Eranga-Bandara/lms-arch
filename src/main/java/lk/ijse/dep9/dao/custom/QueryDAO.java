@@ -2,5 +2,10 @@ package lk.ijse.dep9.dao.custom;
 
 import lk.ijse.dep9.dao.SuperDAO;
 
+import java.util.Optional;
+
 public interface QueryDAO extends SuperDAO {
+
+    Optional<Integer> getAvailableCopies (String isbn);
+
 }

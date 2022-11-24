@@ -10,9 +10,11 @@ import lk.ijse.dep9.service.exception.DuplicateException;
 import lk.ijse.dep9.service.exception.NotFoundException;
 import lk.ijse.dep9.service.util.Converter;
 import lk.ijse.dep9.util.ConnectionUtil;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
 
 public class BookServiceImpl implements BookService {
 
