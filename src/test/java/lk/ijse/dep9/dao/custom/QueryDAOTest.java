@@ -1,5 +1,6 @@
 package lk.ijse.dep9.dao.custom;
 
+import com.github.javafaker.Faker;
 import lk.ijse.dep9.dao.DAOFactory;
 import lk.ijse.dep9.dao.DAOTypes;
 import lk.ijse.dep9.util.ConnectionUtil;
@@ -38,5 +39,13 @@ class QueryDAOTest {
 
     @Test
     void getAvailableCopies() {
+        Faker faker = new Faker();
+        String isbn1 = faker.code().isbn10();
+        String isbn2 = "1234-7891";
+        String isbn3 = "4567-1234";
+
+        assertFalse(queryDAO.getAvailableCopies(isbn1).isPresent());
+        assertEquals(2, queryDAO.getAvailableCopies(isbn2).get());
+        assertEquals(1, queryDAO.getAvailableCopies(isbn3).get());
     }
 }

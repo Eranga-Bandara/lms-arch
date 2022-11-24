@@ -31,6 +31,10 @@ public class IssueServiceImpl implements IssueService {
         converter = new Converter();
     }
 
+    public IssueServiceImpl() {
+
+    }
+
     public void placeNewIssueNote(IssueNoteDTO issueNoteDTO) throws NotFoundException, NotAvailableException, LimitExceedException, AlreadyIssuedException {
 //        check member existance
         if(!memberDAO.existsById(issueNoteDTO.getMemberId())) throw new NotFoundException("Member does not exists");
