@@ -12,8 +12,6 @@ import lk.ijse.dep9.service.exception.NotFoundException;
 import lk.ijse.dep9.service.util.Converter;
 import lk.ijse.dep9.util.ConnectionUtil;
 
-import java.sql.SQLException;
-
 public class IssueServiceImpl implements IssueService {
 
     private final IssueNoteDAO issueNoteDAO;
@@ -60,18 +58,20 @@ public class IssueServiceImpl implements IssueService {
 
             ConnectionUtil.getConnection().commit();
         }catch (Throwable t){
-            try {
-                ConnectionUtil.getConnection().rollback();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+//            try {
+//                ConnectionUtil.getConnection().rollback();
+//            } catch (SQLException e) {
+//                throw new RuntimeException(e);
+//            }
+            Executor.execute(ConnectionUtil.getConnection()::rollback);
             throw new RuntimeException(t);
         }finally {
-            try {
-                ConnectionUtil.getConnection().setAutoCommit(true);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+//            try {
+//                ConnectionUtil.getConnection().setAutoCommit(true);
+//            } catch (SQLException e) {
+//                throw new RuntimeException(e);
+//            }
+            Executor.execute(() -> ConnectionUtil.getConnection().setAutoCommit(true));
         }
     }
 }

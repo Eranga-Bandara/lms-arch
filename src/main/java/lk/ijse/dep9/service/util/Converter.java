@@ -1,10 +1,16 @@
 package lk.ijse.dep9.service.util;
 
 import lk.ijse.dep9.dto.BookDTO;
+import lk.ijse.dep9.dto.IssueNoteDTO;
 import lk.ijse.dep9.dto.MemberDTO;
 import lk.ijse.dep9.entity.Book;
+import lk.ijse.dep9.entity.IssueItem;
+import lk.ijse.dep9.entity.IssueNote;
 import lk.ijse.dep9.entity.Member;
 import org.modelmapper.ModelMapper;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Converter {
 
@@ -32,6 +38,14 @@ public class Converter {
 
     public Member toMember(MemberDTO memberDTO){
         return mapper.map(memberDTO, Member.class);
+    }
+
+    public IssueNote toIssueNote(IssueNoteDTO issueNoteDTO){
+        return mapper.map(issueNoteDTO, IssueNote.class);
+    }
+
+    public List<IssueItem> toIssueItem(IssueNoteDTO issueNoteDTO){
+        return mapper.map(issueNoteDTO, new ArrayList<IssueItem>(){}.getClass());
     }
 
 }
