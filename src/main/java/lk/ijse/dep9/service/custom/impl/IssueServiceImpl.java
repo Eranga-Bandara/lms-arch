@@ -12,6 +12,8 @@ import lk.ijse.dep9.service.exception.NotFoundException;
 import lk.ijse.dep9.service.util.Converter;
 import lk.ijse.dep9.util.ConnectionUtil;
 
+import java.sql.SQLException;
+
 public class IssueServiceImpl implements IssueService {
 
     private final IssueNoteDAO issueNoteDAO;
@@ -37,17 +39,39 @@ public class IssueServiceImpl implements IssueService {
         if(!memberDAO.existsById(issueNoteDTO.getMemberId())) throw new NotFoundException("Member does not exists");
 //        check book existance and availability
         for(String isbn : issueNoteDTO.getBooks()){
-            int copies = queryDAO.getAvailableCopies(isbn).orElseThrow(() -> new NotFoundException("Book " + isbn + " does not exist"));
-            if(copies == 0) throw new NotAvailableException("Book " + isbn + " not available at the moment");
+            int availableCopies = queryDAO.getAvailableCopies(isbn).orElseThrow(() -> new NotFoundException("Book " + isbn + " does not exist"));
+            if(availableCopies == 0) throw new NotAvailableException("Book " + isbn + " not available at the moment");
 
+//        check whether a book in issue note has been already issued to this member
             if(queryDAO.alreadyIssued(isbn, issueNoteDTO.getMemberId())){
                 throw new AlreadyIssuedException("Book " + isbn + " has been already issued to the same member");
             }
         }
-//        check whether a book in issue note has been already issued to this member
 
 //        check how many books can be issued to this member maximum 3
+        Integer availableBookLimit = queryDAO.availableBookLimit(issueNoteDTO.getMemberId()).get();
+        if(availableBookLimit < issueNoteDTO.getBooks().size()) throw new LimitExceedException("Member's book limit has been exceeded");
 
 
+//        Transaction in Try catch hell
+        try{
+            ConnectionUtil.getConnection().setAutoCommit(false);
+
+
+            ConnectionUtil.getConnection().commit();
+        }catch (Throwable t){
+            try {
+                ConnectionUtil.getConnection().rollback();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            throw new RuntimeException(t);
+        }finally {
+            try {
+                ConnectionUtil.getConnection().setAutoCommit(true);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }
