@@ -4,13 +4,18 @@ import lk.ijse.dep9.dao.DAOFactory;
 import lk.ijse.dep9.dao.DAOTypes;
 import lk.ijse.dep9.dao.custom.*;
 import lk.ijse.dep9.dto.IssueNoteDTO;
+import lk.ijse.dep9.entity.IssueItem;
+import lk.ijse.dep9.entity.IssueNote;
 import lk.ijse.dep9.service.custom.IssueService;
 import lk.ijse.dep9.service.exception.AlreadyIssuedException;
 import lk.ijse.dep9.service.exception.LimitExceedException;
 import lk.ijse.dep9.service.exception.NotAvailableException;
 import lk.ijse.dep9.service.exception.NotFoundException;
 import lk.ijse.dep9.service.util.Converter;
+import lk.ijse.dep9.service.util.Executor;
 import lk.ijse.dep9.util.ConnectionUtil;
+
+import java.util.List;
 
 public class IssueServiceImpl implements IssueService {
 
@@ -33,9 +38,9 @@ public class IssueServiceImpl implements IssueService {
 
 
     public void placeNewIssueNote(IssueNoteDTO issueNoteDTO) throws NotFoundException, NotAvailableException, LimitExceedException, AlreadyIssuedException {
-//        check member existance
+//        check member existence
         if(!memberDAO.existsById(issueNoteDTO.getMemberId())) throw new NotFoundException("Member does not exists");
-//        check book existance and availability
+//        check book existence and availability
         for(String isbn : issueNoteDTO.getBooks()){
             int availableCopies = queryDAO.getAvailableCopies(isbn).orElseThrow(() -> new NotFoundException("Book " + isbn + " does not exist"));
             if(availableCopies == 0) throw new NotAvailableException("Book " + isbn + " not available at the moment");
@@ -55,6 +60,11 @@ public class IssueServiceImpl implements IssueService {
         try{
             ConnectionUtil.getConnection().setAutoCommit(false);
 
+            IssueNote issueNote = converter.toIssueNote(issueNoteDTO);
+            List<IssueItem> issueItemList = converter.toIssueItemList(issueNoteDTO);
+
+            issueNoteDAO.save(issueNote);
+            issueItemList.forEach(issueItemDAO::save);
 
             ConnectionUtil.getConnection().commit();
         }catch (Throwable t){
