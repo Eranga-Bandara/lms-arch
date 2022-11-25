@@ -2,11 +2,17 @@ package lk.ijse.dep9.service.util;
 
 import com.github.javafaker.Faker;
 import lk.ijse.dep9.dto.BookDTO;
+import lk.ijse.dep9.dto.IssueNoteDTO;
 import lk.ijse.dep9.dto.MemberDTO;
 import lk.ijse.dep9.entity.Book;
+import lk.ijse.dep9.entity.IssueItem;
+import lk.ijse.dep9.entity.IssueNote;
 import lk.ijse.dep9.entity.Member;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -58,5 +64,24 @@ class ConverterTest {
         assertEquals(memberDTO.getName(), member.getName());
         assertEquals(memberDTO.getAddress(), member.getAddress());
         assertEquals(memberDTO.getContact(), member.getContact());
+    }
+
+    @Test
+    void toIssueNote() {
+        IssueNoteDTO issueNoteDTO = new IssueNoteDTO(null, null, UUID.randomUUID().toString(),
+                new ArrayList<>(Arrays.asList("1234-1234", "1111-1234", "4561-1234")));
+        IssueNote issueNote = converter.toIssueNote(issueNoteDTO);
+
+//        assertEquals(issueNoteDTO.getId(), issueNote.getId());
+        assertEquals(issueNoteDTO.getMemberId(), issueNote.getMemberId());
+//        assertEquals(issueNoteDTO.getDate(), issueNote.getDate());
+    }
+
+    @Test
+    void toIssueItem() {
+        IssueNoteDTO issueNoteDTO = new IssueNoteDTO(null, null, UUID.randomUUID().toString(),
+                new ArrayList<>(Arrays.asList("1234-1234", "1111-1234", "4561-1234")));
+        List<IssueItem> issueItemList = converter.toIssueItemList(issueNoteDTO);
+        assertEquals(issueNoteDTO.getBooks().size(), issueItemList.size());
     }
 }
