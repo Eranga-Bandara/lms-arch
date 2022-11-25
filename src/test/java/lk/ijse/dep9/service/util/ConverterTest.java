@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ConverterTest {
 
-    private Converter converter = new Converter();
+    private final Converter converter = new Converter();
 
     @Test
     void fromBook() {

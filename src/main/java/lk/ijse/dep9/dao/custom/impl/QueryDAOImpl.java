@@ -35,7 +35,7 @@ public class QueryDAOImpl implements QueryDAO {
     }
 
     @Override
-    public boolean alreadyIssued(String isbn, String memberId) {
+    public boolean isAlreadyIssued(String isbn, String memberId) {
         try{
             PreparedStatement stm = connection.prepareStatement("SELECT *, b.title FROM issue_item ii\n" +
             "         INNER JOIN `return` r ON NOT (ii.issue_id = r.issue_id and ii.isbn = r.isbn)\n" +

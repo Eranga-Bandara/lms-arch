@@ -51,11 +51,13 @@ class QueryDAOTest {
     }
 
     @Test
-    void alreadyIssued() {
+    void isAlreadyIssued() {
         String memberId = "104ccff3-c584-4782-a582-8a06479b46f6";
-        String isbn = "1234-7891";
+        String isbn1 = "1234-7891";
+        String isbn2 = "9874-1234";
 
-        assertTrue(queryDAO.alreadyIssued(isbn, memberId));
+        assertTrue(queryDAO.isAlreadyIssued(isbn1, memberId));
+        assertFalse(queryDAO.isAlreadyIssued(isbn2, memberId));
     }
 
     @Test
