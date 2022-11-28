@@ -1,5 +1,8 @@
 package lk.ijse.dep9.dto;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,9 +16,18 @@ import java.util.ArrayList;
 @AllArgsConstructor
 
 public class IssueNoteDTO implements Serializable {
+
+    @Null(message = "Issue note id can't have a value")
     private Integer id;
+
+    @NotNull(message = "Date can't be empty")
     private LocalDate date;
+
+    @NotNull(message = "Member id can't be empty")
+    @Pattern(regexp = "^([A-Fa-f0-9]{8}(-[A-Fa-f0-9]{4}){3}-[A-Fa-f0-9]{12})$")
     private String memberId;
+
+    @NotNull(message = "Books can't be empty")
     private ArrayList<String> books = new ArrayList<>();
 
 }
