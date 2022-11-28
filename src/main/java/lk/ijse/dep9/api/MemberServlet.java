@@ -79,6 +79,7 @@ public class MemberServlet extends HttpServlet2 {
             ConnectionUtil.setConnection(connection);
             MemberService memberService = ServiceFactory.getInstance().getService(ServiceTypes.MEMBER);
             List<MemberDTO> members = memberService.findMembers(query, size, page);
+            response.setIntHeader("X-Total-Count", members.size());
             response.setContentType("application/json");
             JsonbBuilder.create().toJson(members, response.getWriter());
         } catch (SQLException e) {
