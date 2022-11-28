@@ -44,9 +44,9 @@ CREATE TABLE `issue_note`
     CONSTRAINT `issue_note_ibfk_1` FOREIGN KEY (`member_id`) REFERENCES `member` (`id`)
 );
 INSERT INTO `issue_note`
-VALUES (1, '2022-11-14', '104ccff3-c584-4782-a582-8a06479b46f6'),
-       (3, '2022-11-14', '2714641a-301e-43d5-9d31-ad916d075ba6'),
-       (8, '2022-11-15', '104ccff3-c584-4782-a582-8a06479b46f6'),
+VALUES (1, '2022-11-14', '2714641a-301e-43d5-9d31-ad916d075ba7'),
+       (3, '2022-11-14', '2714641a-301e-43d5-9d31-ad916d075ba7'),
+       (8, '2022-11-15', '2714641a-301e-43d5-9d31-ad916d075ba7'),
        (9, '2022-11-15', '104ccff3-c584-4782-a582-8a06479b46f6'),
        (10, '2022-11-15', '104ccff3-c584-4782-a582-8a06479b46f6');
 

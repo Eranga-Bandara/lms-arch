@@ -10,6 +10,7 @@ import lk.ijse.dep9.entity.Member;
 import lk.ijse.dep9.service.ServiceFactory;
 import lk.ijse.dep9.service.ServiceTypes;
 import lk.ijse.dep9.service.custom.MemberService;
+import lk.ijse.dep9.service.exception.DuplicateException;
 import lk.ijse.dep9.service.exception.InUseException;
 import lk.ijse.dep9.service.exception.NotFoundException;
 import lk.ijse.dep9.service.util.Converter;
@@ -38,12 +39,13 @@ class MemberServiceImplTest {
     @BeforeEach
     void setUp() throws SQLException, IOException {
         connection = DriverManager.getConnection("jdbc:h2:mem:");
-//     Lombok Cleanup fro try insteadof try with resource
-        @Cleanup BufferedReader bfr = new BufferedReader(new InputStreamReader(getClass().
-                getResourceAsStream("db.script.sql")));
+//     Lombok Cleanup for try insteadof try with resource
+        @Cleanup BufferedReader bfr = new BufferedReader(
+                new InputStreamReader(getClass().
+                getResourceAsStream("/db.script.sql")));
         String dbScript = bfr.lines().reduce((previous, current) -> previous + current).get();
         connection.createStatement().execute(dbScript);
-        ConnectionUtil.setConnection(connection);  // assosiation connection with the thread
+        ConnectionUtil.setConnection(connection);  // associate connection with the thread
         memberService = ServiceFactory.getInstance().getService(ServiceTypes.MEMBER);
     }
 
@@ -59,7 +61,8 @@ class MemberServiceImplTest {
         MemberDTO member1 = new MemberDTO(UUID.randomUUID().toString(), faker.name().fullName(), faker.address().fullAddress(), "078-1234567");
         MemberDTO member2 = new MemberDTO(UUID.randomUUID().toString(), faker.name().fullName(), faker.address().fullAddress(), faker.regexify("0\\d{2}-\\d{7}"));
 
-//        assertThrows()
+        assertThrows(DuplicateException.class, () -> memberService.signupMember(member1));
+        memberService.signupMember(member2);
     }
 
     @Test
@@ -71,16 +74,17 @@ class MemberServiceImplTest {
         member.setAddress(faker.address().fullAddress());
         member.setContact(faker.regexify("0\\d{2}-\\d{7}"));
 
-        MemberDTO member2 = new MemberDTO(UUID.randomUUID().toString(), faker.name().fullName(), faker.address().fullAddress(), "078-1234567");
+        MemberDTO member2 = new MemberDTO(UUID.randomUUID().toString(), faker.name().fullName(), faker.address().fullAddress(), faker.regexify("0\\d{2}-\\d{7}"));
         memberService.updateMemberDetails(member);
 
-        MemberDTO updatedMember = new Converter().fromMember(memberDAO.findById(member.getId()).get());
+        MemberDTO updatedMember = new Converter().
+                fromMember(memberDAO.findById(member.getId()).get());
 
 //        assertEquals(member.getName(), updatedMember.getName());
 //        assertEquals(member.getAddress(), updatedMember.getAddress());
 //        assertEquals(member.getContact(), updatedMember.getContact());
 
-        assertEquals(member, member2);  // since in same type this way is possible other than above
+        assertNotEquals(member, member2);  // since in same type this way is possible other than above
         assertThrows(NotFoundException.class, () -> memberService.updateMemberDetails(member2));
     }
 

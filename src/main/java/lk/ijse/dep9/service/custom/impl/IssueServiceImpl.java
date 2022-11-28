@@ -46,7 +46,7 @@ public class IssueServiceImpl implements IssueService {
             if(availableCopies == 0) throw new NotAvailableException("Book " + isbn + " not available at the moment");
 
 //        check whether a book in issue note has been already issued to this member
-            if(queryDAO.alreadyIssued(isbn, issueNoteDTO.getMemberId())){
+            if(queryDAO.isAlreadyIssued(isbn, issueNoteDTO.getMemberId())){
                 throw new AlreadyIssuedException("Book " + isbn + " has been already issued to the same member");
             }
         }
@@ -63,8 +63,11 @@ public class IssueServiceImpl implements IssueService {
             IssueNote issueNote = converter.toIssueNote(issueNoteDTO);
             List<IssueItem> issueItemList = converter.toIssueItemList(issueNoteDTO);
 
-            issueNoteDAO.save(issueNote);
-            issueItemList.forEach(issueItemDAO::save);
+            int issueNoteId = issueNoteDAO.save(issueNote).getId();
+            for (IssueItem issueItem : issueItemList) {
+                issueItem.getIssueItemPK().setIssueId(issueNoteId);
+                issueItemDAO.save(issueItem);
+            }
 
             ConnectionUtil.getConnection().commit();
         }catch (Throwable t){

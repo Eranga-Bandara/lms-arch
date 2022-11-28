@@ -34,7 +34,7 @@ class BookServiceTest {
     @BeforeEach
     void setUp() throws SQLException, URISyntaxException, IOException {
         connection = DriverManager.getConnection("jdbc:h2:mem:");  // empty database
-        List<String> lines = Files.readAllLines(Paths.get(this.getClass().getResource("/db.script.sql").toURI()));
+        List<String> lines = Files.readAllLines(Paths.get(BookService.class.getResource("/db.script.sql").toURI()));
         String dbScriptContent = lines.stream().reduce((previous, current) -> previous + "\n" + current).get();
         Statement stm = connection.createStatement();
         stm.execute(dbScriptContent);
@@ -64,14 +64,14 @@ class BookServiceTest {
     void updateBookDetails() {
         Faker faker = new Faker();
         BookDTO book = new BookDTO(faker.code().isbn10(), faker.book().title(), faker.book().author(), 2);
-        BookDTO book2 = bookService.getBookDetails("1234-1234");
+        BookDTO book2 = bookService.getBookDetails("1234-7891");
         book2.setAuthor(faker.book().author());
         book2.setTitle(faker.book().title());
         book2.setCopies(faker.number().numberBetween(1,3));
 
         assertThrows(NotFoundException.class, () -> bookService.updateBookDetails(book));
         bookService.updateBookDetails(book2);
-        BookDTO book3 = bookService.getBookDetails("1234-1234");
+        BookDTO book3 = bookService.getBookDetails("1234-7891");
         assertEquals(book2, book3);
     }
 
@@ -79,10 +79,10 @@ class BookServiceTest {
     void getBookDetails() {
         Faker faker = new Faker();
         String invalidISBN = faker.code().isbn10();
-        String isbn = "1234-1234";
-        String title = "Patterns of Enterprise Application Architecture";
-        String author = "Martin Fowler";
-        int copies = 2;
+        String isbn = "1234-4567";
+        String title = "Application Architecture";
+        String author = "Microsoft";
+        int copies = 3;
 
         assertThrows(NotFoundException.class, () -> bookService.getBookDetails(invalidISBN));
         BookDTO bookDetails = bookService.getBookDetails(isbn);
