@@ -1,8 +1,6 @@
 package lk.ijse.dep9.dto;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,7 +25,10 @@ public class IssueNoteDTO implements Serializable {
     @Pattern(regexp = "^([A-Fa-f0-9]{8}(-[A-Fa-f0-9]{4}){3}-[A-Fa-f0-9]{12})$")
     private String memberId;
 
-    @NotNull(message = "Books can't be empty")
-    private ArrayList<String> books = new ArrayList<>();
+    @NotEmpty(message = "Books can't be empty")
+    private ArrayList<
+            @NotBlank(message = "ISBN can't be a null value",
+            @Pattern(regexp = "^(\\d[\\d\\\\-]*\\d)$", message = "Invalid ISBN"))
+                    String> books = new ArrayList<>();
 
 }
