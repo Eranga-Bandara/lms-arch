@@ -6,14 +6,24 @@ import jakarta.json.bind.JsonbException;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import lk.ijse.dep9.api.exception.ValidationException;
 import lk.ijse.dep9.api.util.HttpServlet2;
 import lk.ijse.dep9.dto.IssueNoteDTO;
+import lk.ijse.dep9.service.ServiceFactory;
+import lk.ijse.dep9.service.ServiceTypes;
+import lk.ijse.dep9.service.SuperService;
+import lk.ijse.dep9.service.custom.IssueService;
+import lk.ijse.dep9.util.ConnectionUtil;
 import lombok.Data;
 
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.Set;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -45,18 +55,26 @@ public class IssueNoteServlet extends HttpServlet2 {
 
         /*  Data Validation  */
 
-        if(issueNoteDTO.getMemberId() == null || !issueNoteDTO.getMemberId().matches("^([A-Fa-f0-9]{8}(-[A-Fa-f0-9]{4}){3}-[A-Fa-f0-9]{12})$")){
-            throw new JsonbException("Member id is empty or invalid");
-        } else if (issueNoteDTO.getBooks().isEmpty()) {
-            throw new JsonbException("Cannot place an issue note without books");  // handle ERD total participation relation between issueNoteDTO
-        } else if (issueNoteDTO.getBooks().size() > 3) {
-            throw new JsonbException("Cannot issue more than 3 books");
-        } else if (issueNoteDTO.getBooks().stream().anyMatch(isbn -> isbn == null || !isbn.matches("^(\\d[\\d\\\\-]*\\d)$"))) {
-            throw new JsonbException("Invalid ISBN in the books list");
-        }
+        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+        Set<ConstraintViolation<IssueNoteDTO>> violations = validator.validate(issueNoteDTO);
+        violations.stream().findAny().ifPresent(violate -> {
+            throw new ValidationException(violate.getMessage());
+        });
+
         /*  Duplicates finding in issue note  */
-        else if(issueNoteDTO.getBooks().stream().collect(Collectors.toSet()).size() != issueNoteDTO.getBooks().size()){
+        if(issueNoteDTO.getBooks().stream().collect(Collectors.toSet()).size() != issueNoteDTO.getBooks().size()){
             throw new JsonbException("Duplicate isbn has been found");
+        }
+
+        try(Connection connection = pool.getConnection()){
+            ConnectionUtil.setConnection(connection);
+            IssueService issueService = ServiceFactory.getInstance().getService(ServiceTypes.ISSUE);
+            issueService.placeNewIssueNote(issueNoteDTO);
+            response.setContentType("application/json");
+            response.setStatus(HttpServletResponse.SC_CREATED);
+            JsonbBuilder.create().toJson(issueNoteDTO, response.getWriter());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
 
     }

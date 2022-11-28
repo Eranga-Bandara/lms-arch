@@ -28,7 +28,6 @@ public class IssueNoteDTO implements Serializable {
     @NotEmpty(message = "Books can't be empty")
     private ArrayList<
             @NotBlank(message = "ISBN can't be a null value",
-            @Pattern(regexp = "^(\\d[\\d\\\\-]*\\d)$", message = "Invalid ISBN"))
-                    String> books = new ArrayList<>();
+            @Pattern(regexp = "^(\\d[\\d\\\\-]*\\d)$", message = "Invalid ISBN"))String> books = new ArrayList<>();
 
 }
