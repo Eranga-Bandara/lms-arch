@@ -14,6 +14,7 @@ import lk.ijse.dep9.api.exception.ValidationException;
 import lk.ijse.dep9.api.util.HttpServlet2;
 import lk.ijse.dep9.dto.BookDTO;
 import lk.ijse.dep9.dto.MemberDTO;
+import lk.ijse.dep9.exception.ResponseStatusException;
 import lk.ijse.dep9.service.BOLogics;
 import lk.ijse.dep9.service.ServiceFactory;
 import lk.ijse.dep9.service.ServiceTypes;
@@ -101,7 +102,7 @@ public class BookServlet extends HttpServlet2 {
         if (request.getPathInfo() == null || request.getPathInfo().equals("/")) {
             saveBook(request, response);
         } else {
-            response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+            throw new ResponseStatusException(501);
         }
     }
 
