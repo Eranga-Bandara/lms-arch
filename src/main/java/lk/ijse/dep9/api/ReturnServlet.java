@@ -6,9 +6,14 @@ import jakarta.json.bind.JsonbException;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import lk.ijse.dep9.api.exception.ValidationException;
 import lk.ijse.dep9.api.util.HttpServlet2;
 import lk.ijse.dep9.dto.ReturnDTO;
 import lk.ijse.dep9.dto.ReturnItemDTO;
+import lk.ijse.dep9.exception.ResponseStatusException;
 import lk.ijse.dep9.service.ServiceFactory;
 import lk.ijse.dep9.service.ServiceTypes;
 import lk.ijse.dep9.service.SuperService;
@@ -39,31 +44,25 @@ public class ReturnServlet extends HttpServlet2 {
         }
        try{
            if(request.getContentType() == null || request.getContentType().startsWith("application/json")){
-               response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid JSON");
-               return;
+//               response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid JSON");
+               throw new ResponseStatusException(501);
            }
 
            ReturnDTO returnDTO = JsonbBuilder.create().fromJson(request.getReader(), ReturnDTO.class);
 
            addReturnItems(returnDTO, response);
        }catch (JsonbException e){
-           response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+           throw new ValidationException(e.getMessage());
        }
     }
 
     private void addReturnItems(ReturnDTO returnDTO, HttpServletResponse response) throws IOException {
         /* Data Validation */
-        if (returnDTO.getMemberId() == null || !returnDTO.getMemberId().matches("^([A-Fa-f0-9]{8}(-[A-Fa-f0-9]{4}){3}-[A-Fa-f0-9]{12})$")){
-            throw new JsonbException("Member id is empty or invalid");
-        } else if (returnDTO.getReturnItems().isEmpty()) {
-            throw new JsonbException("No return items have been found");
-        } else if (returnDTO.getReturnItems().stream().anyMatch(Objects::isNull)) {  // dto -> dto == null
-            throw new JsonbException("Null items have been found in the list");
-        } else if (returnDTO.getReturnItems().stream().anyMatch(item ->
-            item.getIssueNoteId() == null || item.getIsbn() == null || !item.getIsbn().matches("([0-9][0-9\\\\-]*[0-9])"))) {
-            throw new JsonbException("Some items are invalid");
-        }
-        Set<ReturnItemDTO> returnItems = returnDTO.getReturnItems().stream().collect(Collectors.toSet());
+        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+        Set<ConstraintViolation<ReturnDTO>> violations = validator.validate(returnDTO);
+        violations.stream().findAny().ifPresent(violate -> {
+            throw new ValidationException(violate.getMessage());
+        });
 
         /*  Business Validation  */
         try(Connection connection = pool.getConnection()) {
