@@ -194,6 +194,8 @@ public class MemberServlet extends HttpServlet2 {
                         throw new ValidationException(violate.getMessage());
                     });
 
+            if(!memberId.equals(member.getId()))throw new ValidationException("Member ids are mismatched");
+
             try(Connection connection = pool.getConnection()) {
                ConnectionUtil.setConnection(connection);
                 MemberService memberService = ServiceFactory.getInstance().getService(ServiceTypes.MEMBER);
