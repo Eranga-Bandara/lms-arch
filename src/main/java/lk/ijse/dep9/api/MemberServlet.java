@@ -1,5 +1,6 @@
 package lk.ijse.dep9.api;
 
+import ch.qos.logback.classic.spi.IThrowableProxy;
 import jakarta.annotation.Resource;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbException;
@@ -13,6 +14,7 @@ import jakarta.validation.Validator;
 import lk.ijse.dep9.api.exception.ValidationException;
 import lk.ijse.dep9.dto.MemberDTO;
 import lk.ijse.dep9.api.util.HttpServlet2;
+import lk.ijse.dep9.dto.util.Groups;
 import lk.ijse.dep9.entity.Member;
 import lk.ijse.dep9.exception.ResponseStatusException;
 import lk.ijse.dep9.service.BOLogics;
@@ -184,32 +186,22 @@ public class MemberServlet extends HttpServlet2 {
             }
 
             MemberDTO member = JsonbBuilder.create().fromJson(request.getReader(), MemberDTO.class);
-
-            if (member.getId() == null || !memberId.equalsIgnoreCase(member.getId())){
-                throw new JsonbException("Id is empty or invalid");
-            }else if (member.getName() == null || !member.getName().matches("[A-Za-z ]+")){
-                throw new JsonbException("Name is empty or invalid");
-            } else if (member.getAddress() == null || !member.getAddress().matches("^[A-Za-z0-9| ,.:;#\\/\\\\-]+$")) {
-                throw new JsonbException("Address is empty or invalid");
-            } else if (member.getContact() == null || !member.getContact().matches("\\d{3}-\\d{7}")) {
-                throw new JsonbException("Contact number is empty or invalid");
-            }
+            Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+            Set<ConstraintViolation<MemberDTO>> violations = validator.validate(member, Groups.Update.class);
+            violations.stream().findAny().ifPresent(
+                    violate -> {
+                        throw new ValidationException(violate.getMessage());
+                    });
 
             try(Connection connection = pool.getConnection()) {
                ConnectionUtil.setConnection(connection);
-                if(BOLogics.updateMember(member)){
-                    response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-                }else{
-//                    response.sendError(HttpServletResponse.SC_NOT_FOUND, "Member does not exist");
-                    throw new ResponseStatusException(404, "Member does not exist");
-                }
+                MemberService memberService = ServiceFactory.getInstance().getService(ServiceTypes.MEMBER);
+                memberService.updateMemberDetails(member);
+                response.setStatus(HttpServletResponse.SC_NO_CONTENT);
             } catch (SQLException e) {
-//                e.printStackTrace();
-//                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to update the member");
                 throw new RuntimeException(e);
             }
         }catch(JsonbException e){
-//            response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
             throw new ResponseStatusException(400, e.getMessage(), e);
         }
     }
