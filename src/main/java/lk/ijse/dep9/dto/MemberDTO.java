@@ -1,6 +1,7 @@
 package lk.ijse.dep9.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import lk.ijse.dep9.dto.util.Groups;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class MemberDTO implements Serializable {
 
+    @NotBlank(groups = Groups.Update.class, message = "Member Id can't be empty")
     private String id;
 
     @NotBlank(message = "Name can't be empty")

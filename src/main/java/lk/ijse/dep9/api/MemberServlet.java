@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
+import lk.ijse.dep9.api.exception.ValidationException;
 import lk.ijse.dep9.dto.MemberDTO;
 import lk.ijse.dep9.api.util.HttpServlet2;
 import lk.ijse.dep9.entity.Member;
@@ -107,19 +108,18 @@ public class MemberServlet extends HttpServlet2 {
 
                 Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
                 Set<ConstraintViolation<MemberDTO>> violations = validator.validate(member);
+                if (!violations.isEmpty()){
+                    throw new ValidationException(violations.stream().findAny().get().getMessage());
+                }
 
                 try(Connection connection = pool.getConnection()) {
+                    MemberService memberService = ServiceFactory.getInstance().getService(ServiceTypes.MEMBER);
+                    memberService.signupMember(member);
+                    response.setStatus(HttpServletResponse.SC_CREATED);
+                    response.setContentType("application/json");
+                    JsonbBuilder.create().toJson(member, response.getWriter());
                     ConnectionUtil.setConnection(connection);
-                    if (BOLogics.createMember(member)){
-                        response.setStatus(HttpServletResponse.SC_CREATED);
-                        response.setContentType("application/json");
-                        JsonbBuilder.create().toJson(member, response.getWriter());
-                    }else {
-                        throw new SQLException("Something went wrong");
-                    }
                 } catch (SQLException e) {
-//                    e.printStackTrace();
-//                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
                     throw new RuntimeException(e);
                 }
             }catch (JsonbException e){
@@ -152,11 +152,9 @@ public class MemberServlet extends HttpServlet2 {
     private void deleteMember(String memberId, HttpServletResponse response){
         try(Connection connection = pool.getConnection()) {
             ConnectionUtil.setConnection(connection);
-            if (BOLogics.deleteMember(memberId)){
-                response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-            }else{
-                throw new ResponseStatusException(400, "Something went wrong");
-            }
+            MemberService memberService = ServiceFactory.getInstance().getService(ServiceTypes.MEMBER);
+            memberService.removeMemberAccount(memberId);
+            response.setStatus(HttpServletResponse.SC_NO_CONTENT);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
