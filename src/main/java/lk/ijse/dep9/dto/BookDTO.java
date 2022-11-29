@@ -16,15 +16,15 @@ import java.io.Serializable;
 public class BookDTO implements Serializable {
 //    fields we like to use in data transfer
     @NotBlank(message = "ISBN can't be empty")
-    @Pattern(regexp = "([0-9][0-9\\\\-]*[0-9])")
+    @Pattern(regexp = "([0-9][0-9\\\\-]*[0-9])", message = "Invalid JSON")
     private String isbn;
 
     @NotBlank(message = "Title can't be empty")
-    @Pattern(regexp = ".+")
+    @Pattern(regexp = ".+", message = "Invalid Title")
     private String title;
 
     @NotBlank(message = "Author can't be empty")
-    @Pattern(regexp = "[A-Za-z ]+")
+    @Pattern(regexp = "[A-Za-z ]+", message = "Iinvalid Author")
     private String author;
 
     @NotNull(message = "Copies can't be empty")
