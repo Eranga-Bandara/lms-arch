@@ -39,17 +39,15 @@ public class ReturnServlet extends HttpServlet2 {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if(request.getPathInfo() != null && !request.getPathInfo().equals("/")){
-            response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
-            return;
+            throw new ResponseStatusException(501);
         }
        try{
            if(request.getContentType() == null || request.getContentType().startsWith("application/json")){
 //               response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid JSON");
-               throw new ResponseStatusException(501);
+               throw new JsonbException("Invalid JSON");
            }
 
            ReturnDTO returnDTO = JsonbBuilder.create().fromJson(request.getReader(), ReturnDTO.class);
-
            addReturnItems(returnDTO, response);
        }catch (JsonbException e){
            throw new ValidationException(e.getMessage());
