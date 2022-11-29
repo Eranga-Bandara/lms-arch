@@ -22,12 +22,12 @@ public class IssueNoteDTO implements Serializable {
     private LocalDate date;
 
     @NotNull(message = "Member id can't be empty")
-    @Pattern(regexp = "^([A-Fa-f0-9]{8}(-[A-Fa-f0-9]{4}){3}-[A-Fa-f0-9]{12})$")
+    @Pattern(regexp = "^([A-Fa-f0-9]{8}(-[A-Fa-f0-9]{4}){3}-[A-Fa-f0-9]{12})$", message = "Invalid member Id")
     private String memberId;
 
     @NotEmpty(message = "Books can't be empty")
     private ArrayList<
-            @NotBlank(message = "ISBN can't be a null value",
-            @Pattern(regexp = "^(\\d[\\d\\\\-]*\\d)$", message = "Invalid ISBN"))String> books = new ArrayList<>();
+            @NotBlank(message = "ISBN can't be a null value")
+            @Pattern(regexp = "^(\\d[\\d\\\\-]*\\d)$", message = "Invalid ISBN")String> books = new ArrayList<>();
 
 }
