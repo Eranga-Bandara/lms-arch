@@ -18,6 +18,6 @@ public class ReturnItemDTO implements Serializable {
     private Integer issueNoteId;
 
     @NotBlank(message = "ISBN can't be empty")
-    @Pattern(regexp = "([0-9][0-9\\\\-]*[0-9])")
+    @Pattern(regexp = "([0-9][0-9\\\\-]*[0-9])", message = "Invalid ISBN")
     private String isbn;
 }

@@ -19,7 +19,7 @@ import java.util.List;
 public class ReturnDTO implements Serializable {
 
     @NotBlank(message = "Member id can't be empty")
-    @Pattern(regexp = "^([A-Fa-f0-9]{8}(-[A-Fa-f0-9]{4}){3}-[A-Fa-f0-9]{12})$")
+    @Pattern(regexp = "^([A-Fa-f0-9]{8}(-[A-Fa-f0-9]{4}){3}-[A-Fa-f0-9]{12})$", message = "Invalid Member Id")
     private String memberId;
 
     @NotEmpty(message = "Return item can't be empty")
