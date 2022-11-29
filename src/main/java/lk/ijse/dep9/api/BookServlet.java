@@ -66,14 +66,13 @@ public class BookServlet extends HttpServlet2 {
             if (matcher.matches()) {
                 getBookDetails(matcher.group(1), response);
             } else {
-                response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+                throw new ResponseStatusException(501);
             }
         }
     }
 
     private void searchPaginatedBooks(String query, int size, int page, HttpServletResponse response) throws IOException {
         try (Connection connection = pool.getConnection()) {
-
             ConnectionUtil.setConnection(connection);
             BookService bookService = ServiceFactory.getInstance().getService(ServiceTypes.BOOK);
             List<BookDTO> books = bookService.findBooks(query, size, page);
@@ -91,7 +90,7 @@ public class BookServlet extends HttpServlet2 {
             BookService bookService = ServiceFactory.getInstance().getService(ServiceTypes.BOOK);
             BookDTO bookDetails = bookService.getBookDetails(isbn);
             response.setContentType("application/json");
-            JsonbBuilder.create().toJson(bookDetails);
+            JsonbBuilder.create().toJson(bookDetails, response.getWriter());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -116,40 +115,36 @@ public class BookServlet extends HttpServlet2 {
 
             Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
             Set<ConstraintViolation<BookDTO>> violations = validator.validate(book);
-            if(!violations.isEmpty()){
-                throw new ValidationException(violations.stream().findAny().get().getMessage());
-            }
+            violations.stream().findAny().ifPresent(violation -> {
+                throw new ValidationException(violation.getMessage());
+            });
 
             try (Connection connection = pool.getConnection()) {
                 ConnectionUtil.setConnection(connection);
-                if (BOLogics.saveBook(book)) {
-                    response.setStatus(HttpServletResponse.SC_CREATED);
-                    response.setContentType("application/json");
-                    JsonbBuilder.create().toJson(book, response.getWriter());
-                } else {
-                    throw new SQLException("Something went wrong");
-                }
+                BookService bookService = ServiceFactory.getInstance().getService(ServiceTypes.BOOK);
+                bookService.addNewBook(book);
+                response.setStatus(HttpServletResponse.SC_CREATED);
+                response.setContentType("application/json");
+                JsonbBuilder.create().toJson(book, response.getWriter());
             } catch (SQLException e) {
-                e.printStackTrace();
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+                throw new RuntimeException(e);
             }
         } catch (JsonbException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            throw new ValidationException(e.getMessage());
         }
     }
 
     @Override
     protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws IOException {
         if (request.getPathInfo() == null || request.getPathInfo().equals("/")){
-            response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
-            return;
+            throw new ResponseStatusException(501);
         }
 
         Matcher matcher = Pattern.compile("^/([0-9][0-9\\\\-]*[0-9])/?$").matcher(request.getPathInfo());
         if (matcher.matches()){
             updateBookDetails(matcher.group(1), request, response);
         }else {
-            response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+            throw new ResponseStatusException(501);
         }
     }
 
@@ -161,29 +156,24 @@ public class BookServlet extends HttpServlet2 {
 
             BookDTO book = JsonbBuilder.create().fromJson(request.getReader(), BookDTO.class);
 
-            if (book.getIsbn() == null || !book.getIsbn().equalsIgnoreCase(isbn)) {
-                throw new JsonbException("Book isbn is empty or invalid");
-            } else if (book.getTitle() == null || !book.getTitle().matches(".+")) {
-                throw new JsonbException("Book title is empty or invalid");
-            } else if (book.getAuthor() == null || !book.getAuthor().matches("[A-Za-z ]+")) {
-                throw new JsonbException("Author is empty or invalid");
-            } else if (book.getCopies() == null || book.getCopies() < 1) {
-                throw new JsonbException("Copies is empty or invalid");
-            }
+            Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+            Set<ConstraintViolation<BookDTO>> violations = validator.validate(book);
+            violations.stream().findAny().ifPresent(violation -> {
+                throw new ValidationException(violation.getMessage());
+            });
+
+            if (!book.getIsbn().equals(isbn)) throw new ValidationException("Book ISBNs are mismatched");
 
             try (Connection connection = pool.getConnection()) {
                 ConnectionUtil.setConnection(connection);
-                if (BOLogics.updateBook(book)) {
-                    response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-                } else {
-                   response.sendError(HttpServletResponse.SC_NOT_FOUND, "Book does not exist");
-                }
+                BookService bookService = ServiceFactory.getInstance().getService(ServiceTypes.BOOK);
+                bookService.updateBookDetails(book);
+                response.setStatus(HttpServletResponse.SC_NO_CONTENT);
             } catch (SQLException e) {
-                e.printStackTrace();
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to update the book");
+                throw new RuntimeException(e);
             }
         } catch (JsonbException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            throw new ValidationException(e.getMessage());
         }
     }
 }
