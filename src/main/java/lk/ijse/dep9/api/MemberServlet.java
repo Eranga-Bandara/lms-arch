@@ -93,7 +93,7 @@ public class MemberServlet extends HttpServlet2 {
             MemberService memberService = ServiceFactory.getInstance().getService(ServiceTypes.MEMBER);
             MemberDTO memberDetails = memberService.getMemberDetails(memberId);
             response.setContentType("application/json");
-            JsonbBuilder.create().toJson(memberDetails);
+            JsonbBuilder.create().toJson(memberDetails, response.getWriter());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -116,12 +116,12 @@ public class MemberServlet extends HttpServlet2 {
                 }
 
                 try(Connection connection = pool.getConnection()) {
+                    ConnectionUtil.setConnection(connection);
                     MemberService memberService = ServiceFactory.getInstance().getService(ServiceTypes.MEMBER);
                     memberService.signupMember(member);
                     response.setStatus(HttpServletResponse.SC_CREATED);
                     response.setContentType("application/json");
                     JsonbBuilder.create().toJson(member, response.getWriter());
-                    ConnectionUtil.setConnection(connection);
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }

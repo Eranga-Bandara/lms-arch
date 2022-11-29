@@ -37,7 +37,6 @@ public class IssueNoteServlet extends HttpServlet2 {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if(request.getPathInfo() != null && !request.getPathInfo().equals("/")){
             throw new ResponseStatusException(501);
-            return;
         }
 
         try{
@@ -64,7 +63,7 @@ public class IssueNoteServlet extends HttpServlet2 {
 
         /*  Duplicates finding in issue note  */
         if(issueNoteDTO.getBooks().stream().collect(Collectors.toSet()).size() != issueNoteDTO.getBooks().size()){
-            throw new JsonbException("Duplicate isbn has been found");
+            throw new ValidationException("Duplicate isbn has been found");
         }
 
         try(Connection connection = pool.getConnection()){
